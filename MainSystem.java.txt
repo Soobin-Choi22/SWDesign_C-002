@@ -1,0 +1,72 @@
+public class AirlineSystem {
+    private Map<String, Customer> customers = new HashMap<>();
+    private Map<String, Ticket> tickets = new HashMap<>();
+    private Map<String, Reservation> reservations = new HashMap<>();
+
+    // [기능] 고객/항공권 등록 (초기 데이터 구축용)
+    public void registerCustomer(Customer c) { customers.put(c.ssn, c); }
+    public void registerTicket(Ticket t) { tickets.put(t.flightId + t.seat, t); }
+
+    // [기능] 고객 인증
+    public boolean authenticate(String ssn, String password) {
+        Customer c = customers.get(ssn);
+        return c != null && c.password.equals(password);
+    }
+
+    // [핵심 기능] 예약 (Reservation)
+    public void makeReservation(String ssn, String password, String flightId, String seat, String date) {
+        // 1. 고객 인증 및 항공권 조회 필수
+        if (!authenticate(ssn, password)) {
+            System.out.println("인증 실패");
+            return;
+        }
+        
+        Ticket ticket = tickets.get(flightId + seat);
+        if (ticket == null) {
+            System.out.println("항공권 정보가 없습니다.");
+            return;
+        }
+
+        // 2. 예약 5개 제한 체크 (단순 예시 로직)
+        long currentCount = reservations.values().stream().filter(r -> r.ssn.equals(ssn)).count();
+        if (currentCount >= 5) {
+            System.out.println("한 번에 5개까지만 예약 가능합니다.");
+            return;
+        }
+
+        // 3. 예약 생성 및 저장
+        Reservation res = new Reservation(ssn, flightId, seat, date);
+        reservations.put(res.reservationId, res);
+        System.out.println("예약 완료: ID = " + res.reservationId);
+    }
+
+    // [핵심 기능] 구매 (Purchase)
+    public int purchase(String ssn, String password, String reservationId) {
+        // 1. 고객 인증, 예약조회, 마일리지 조회 필수
+        if (!authenticate(ssn, password)) return -1;
+        
+        Reservation res = reservations.get(reservationId);
+        if (res == null || !res.ssn.equals(ssn)) return -1;
+
+        Customer user = customers.get(ssn);
+        Ticket ticket = tickets.get(res.flightId + res.seat);
+
+        // 2. 모든 조회가 문제 없으면 구매 진행
+        res.isPurchased = true;
+        
+        // 3. 마일리지 할인 로직
+        int finalCost = ticket.price;
+        if (user.mileage > 0) {
+            finalCost = ticket.price - user.mileage;
+            if (finalCost < 0) finalCost = 0; // 비용이 음수가 되지 않도록 처리
+        }
+        
+        res.cost = finalCost;
+        return res.cost; // 구매비용 반환
+    }
+
+    // [기능] 예약 조회
+    public Reservation getReservation(String reservationId) {
+        return reservations.get(reservationId);
+    }
+}

@@ -1,0 +1,54 @@
+import java.util.*;
+
+// 고객 클래스
+class Customer {
+    String ssn;        // 주민번호
+    String password;   // 암호
+    String name;       // 성명
+    int mileage;       // 마일리지
+
+    public Customer(String ssn, String password, String name, int mileage) {
+        this.ssn = ssn;
+        this.password = password;
+        this.name = name;
+        this.mileage = mileage;
+    }
+}
+
+// 항공권 클래스
+class Ticket {
+    String flightId;   // 비행기편
+    String seat;       // 좌석
+    String departure;  // 출발시간
+    String arrival;    // 도착시간
+    int price;         // 항공권가격
+
+    public Ticket(String flightId, String seat, String departure, String arrival, int price) {
+        this.flightId = flightId;
+        this.seat = seat;
+        this.departure = departure;
+        this.arrival = arrival;
+        this.price = price;
+    }
+}
+
+// 예약 정보 클래스
+class Reservation {
+    String reservationId; // 예약ID (ssn + flightId + seat)
+    String ssn;
+    String flightId;
+    String seat;
+    String date;          // 예약날짜 (고객 직접 입력)
+    boolean isPurchased;  // 구매여부
+    int cost;             // 구매비용
+
+    public Reservation(String ssn, String flightId, String seat, String date) {
+        this.reservationId = ssn + "+" + flightId + "+" + seat;
+        this.ssn = ssn;
+        this.flightId = flightId;
+        this.seat = seat;
+        this.date = date;
+        this.isPurchased = false;
+        this.cost = 0;
+    }
+}
