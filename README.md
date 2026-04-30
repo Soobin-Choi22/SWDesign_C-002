@@ -1,103 +1,46 @@
 ```mermaid
 graph LR
+    %% Actors
+    Customer((고객))
+    Admin((관리자))
 
-&#x20;   %% Actors
+    %% System Boundary
+    subgraph "항공 예약 시스템"
+        %% Customer Management
+        UC_Register([고객등록])
+        UC_Inquiry([고객조회])
+        UC_Auth([고객인증])
+        UC_Mileage([마일리지조회])
 
-&#x20;   Customer((고객))
+        %% Ticket Management
+        UC_T_Reg([항공권등록])
+        UC_T_Inq([항공권조회])
+        UC_T_Price([항공권가격조회])
 
-&#x20;   Admin((관리자))
+        %% Reservation & Purchase
+        UC_Reserve([예약])
+        UC_Res_Inq([예약조회])
+        UC_Purchase([구매])
+    end
 
+    %% Actor Relationships
+    Customer --- UC_Register
+    Customer --- UC_Inquiry
+    Customer --- UC_Mileage
+    Customer --- UC_T_Inq
+    Customer --- UC_T_Price
+    Customer --- UC_Reserve
+    Customer --- UC_Res_Inq
+    Customer --- UC_Purchase
 
+    Admin --- UC_T_Reg
 
-&#x20;   %% System Boundary / Subgraphs
+    %% Include Relationships (비즈니스 로직 반영)
+    %% [예약] 필수 조건: 고객인증, 항공권조회
+    UC_Reserve -. "<<include>>" .-> UC_Auth
+    UC_Reserve -. "<<include>>" .-> UC_T_Inq
 
-&#x20;   subgraph 고객\_관리\_기능
-
-&#x20;       UC1(\[고객등록])
-
-&#x20;       UC2(\[고객조회])
-
-&#x20;       UC3(\[고객인증])
-
-&#x20;       UC4(\[마일리지조회])
-
-&#x20;   end
-
-
-
-&#x20;   subgraph 항공권\_관리\_기능
-
-&#x20;       UC5(\[항공권등록])
-
-&#x20;       UC6(\[항공권조회])
-
-&#x20;       UC7(\[항공권가격조회])
-
-&#x20;   end
-
-
-
-&#x20;   subgraph 예약\_및\_구매\_기능
-
-&#x20;       UC8(\[예약])
-
-&#x20;       UC9(\[예약조회])
-
-&#x20;       UC10(\[구매])
-
-&#x20;   end
-
-
-
-&#x20;   %% Actor to Use Case Connections (Association)
-
-&#x20;   Customer --- UC1
-
-&#x20;   Customer --- UC2
-
-&#x20;   Customer --- UC4
-
-&#x20;   Customer --- UC6
-
-&#x20;   Customer --- UC7
-
-&#x20;   Customer --- UC8
-
-&#x20;   Customer --- UC9
-
-&#x20;   Customer --- UC10
-
-&#x20;   
-
-&#x20;   %% Admin normally registers tickets
-
-&#x20;   Admin --- UC5
-
-
-
-&#x20;   %% Include Relationships (필수 조건)
-
-&#x20;   %% 1. 예약은 반드시 고객인증, 항공권조회를 해야 함
-
-&#x20;   UC8 -. "<<include>>" .-> UC3
-
-&#x20;   UC8 -. "<<include>>" .-> UC6
-
-
-
-&#x20;   %% 2. 구매는 반드시 고객인증, 예약조회, 마일리지조회를 해야 함
-
-&#x20;   UC10 -. "<<include>>" .-> UC3
-
-&#x20;   UC10 -. "<<include>>" .-> UC9
-
-&#x20;   UC10 -. "<<include>>" .-> UC4
-
-
-
-&#x20;   %% 다이어그램 스타일 설정
-
-&#x20;   classDef default fill:#f9f9f9,stroke:#333,stroke-width:2px;
-
-&#x20;   classDef include stroke-dasharray: 5 5;
-
+    %% [구매] 필수 조건: 고객인증, 예약조회, 마일리지조회
+    UC_Purchase -. "<<include>>" .-> UC_Auth
+    UC_Purchase -. "<<include>>" .-> UC_Res_Inq
+    UC_Purchase -. "<<include>>" .-> UC_Mileage
